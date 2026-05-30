@@ -14,3 +14,8 @@ python-pptx
 openpyxl
 psutil
 pyttsx3
+beautifulsoup4
+pycaw
+comtypes
+screen-brightness-control
+beautifulsoup4

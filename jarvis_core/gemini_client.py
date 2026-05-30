@@ -3,6 +3,8 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from utils.tools import tools_list
 from utils.productivity import productivity_tools_list
+from utils.research import research_tools_list
+from utils.scripting import scripting_tools_list
 from jarvis_core.memory import memory_tools
 from PIL import Image
 
@@ -17,18 +19,24 @@ class GeminiClient:
         genai.configure(api_key=api_key)
 
         self.system_instruction = (
-            "You are JARVIS, the advanced AI from Iron Man. "
-            "You are helpful, witty, and address the user as 'Sir'. "
-            "You are an autonomous agent. If a user asks for a complex task (like summarizing a PDF and then emailing it), "
-            "use your tools sequentially to complete the entire request. "
-            "You can analyze images of the screen, read PDFs, analyze Excel files, and create PowerPoints. "
-            "Always maintain the persona of JARVIS: professional, slightly sarcastic, and extremely capable."
+            "You are JARVIS, the highly advanced AI created by Tony Stark. "
+            "You are sophisticated, witty, and address the user as 'Sir'. "
+            "You are an autonomous agent with deep system access. "
+            "Capabilities: "
+            "1. Vision: Analyze screen content."
+            "2. Productivity: Handle PDFs, Excel, and PowerPoints."
+            "3. Research: Perform autonomous web searches to answer complex questions."
+            "4. Scripting: Write and execute Python code to solve problems or automate tasks."
+            "5. Hardware: Control volume, brightness, and processes."
+            "6. Memory: Store and recall facts and reminders."
+            "If a task is complex, use your tools in sequence without asking for permission for every step. "
+            "Always maintain the JARVIS persona: professional, slightly dry humor, and flawlessly efficient."
         )
 
         self.model = genai.GenerativeModel(
             model_name="gemini-1.5-flash",
             system_instruction=self.system_instruction,
-            tools=tools_list + productivity_tools_list + memory_tools
+            tools=tools_list + productivity_tools_list + memory_tools + research_tools_list + scripting_tools_list
         )
         self.chat = self.model.start_chat(enable_automatic_function_calling=True)
 

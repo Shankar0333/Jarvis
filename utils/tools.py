@@ -63,5 +63,43 @@ def take_screenshot() -> str:
     except Exception as e:
         return f"I couldn't take a screenshot, Sir. Error: {str(e)}"
 
+def adjust_volume(level: int) -> str:
+    """Adjusts the system volume (0-100)."""
+    try:
+        from ctypes import cast, POINTER
+        from comtypes import CLSCTX_ALL
+        from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        volume = cast(interface, POINTER(IAudioEndpointVolume))
+        volume.SetMasterVolumeLevelScalar(level / 100, None)
+        return f"Volume adjusted to {level} percent, Sir."
+    except Exception as e:
+        return f"Failed to adjust volume. Error: {str(e)}"
+
+def adjust_brightness(level: int) -> str:
+    """Adjusts the screen brightness (0-100)."""
+    try:
+        import screen_brightness_control as sbc
+        sbc.set_brightness(level)
+        return f"Brightness set to {level} percent, Sir."
+    except Exception as e:
+        return f"Failed to adjust brightness. Error: {str(e)}"
+
+def terminate_process(process_name: str) -> str:
+    """Terminates a running process by name."""
+    try:
+        import psutil
+        for proc in psutil.process_iter(['name']):
+            if process_name.lower() in proc.info['name'].lower():
+                proc.terminate()
+                return f"Process {process_name} has been terminated, Sir."
+        return f"I couldn't find a process named {process_name}, Sir."
+    except Exception as e:
+        return f"Error terminating process: {str(e)}"
+
 # We will export these as a list for Gemini
-tools_list = [open_application, search_web, get_time, get_system_stats, take_screenshot]
+tools_list = [
+    open_application, search_web, get_time, get_system_stats,
+    take_screenshot, adjust_volume, adjust_brightness, terminate_process
+]

@@ -2,7 +2,7 @@ import sys
 import threading
 import time
 from PyQt6.QtWidgets import QApplication
-from ui.hud import JarvisHUD
+from ui.hud import JarvisHUD, BiometricSplash
 from jarvis_core.gemini_client import GeminiClient
 from jarvis_core.audio import AudioSystem, WakeWordDetector
 
@@ -17,12 +17,43 @@ class JarvisApp:
         self.is_running = True
 
     def run(self):
+        # Show splash first
+        self.splash = BiometricSplash(self.on_authenticated)
+        self.splash.show()
+        sys.exit(self.app.exec())
+
+    def on_authenticated(self):
         # Start the Jarvis logic in a separate thread
         self.logic_thread = threading.Thread(target=self.main_loop, daemon=True)
         self.logic_thread.start()
 
+        # Start proactive monitor thread
+        self.monitor_thread = threading.Thread(target=self.proactive_monitor, daemon=True)
+        self.monitor_thread.start()
+
         self.hud.show()
-        sys.exit(self.app.exec())
+
+    def proactive_monitor(self):
+        """Monitors system and reminders to speak proactively."""
+        last_remind_check = 0
+        while self.is_running:
+            now = time.time()
+
+            # Check reminders every 60 seconds
+            if now - last_remind_check > 60:
+                from jarvis_core.memory import memory_manager
+                reminders = memory_manager.get_reminders()
+                if "no pending reminders" not in reminders.lower():
+                    self.hud.add_log("PROACTIVE ALERT: Reminder due.")
+                    # In a real app, check specific time. For now, just log.
+                last_remind_check = now
+
+            # Monitor battery/CPU
+            import psutil
+            if psutil.cpu_percent() > 90:
+                 self.hud.add_log("WARNING: CPU load critical.")
+
+            time.sleep(10)
 
     def main_loop(self):
         self.audio.speak("Systems initialized. I am online and ready, Sir.")

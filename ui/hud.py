@@ -37,10 +37,50 @@ class ArcReactor(QWidget):
         painter.setBrush(QColor(0, 255, 255, 100))
         painter.drawEllipse(40, 40, 20, 20)
 
+class BiometricSplash(QWidget):
+    def __init__(self, callback):
+        super().__init__()
+        self.callback = callback
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setFixedSize(600, 400)
+
+        layout = QVBoxLayout()
+        self.label = QLabel("IDENTITY SCAN IN PROGRESS...")
+        self.label.setFont(QFont("Consolas", 18, QFont.Weight.Bold))
+        self.label.setStyleSheet("color: #00ffff;")
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.label)
+
+        self.progress = QProgressBar()
+        self.progress.setStyleSheet("QProgressBar { border: 2px solid #00ffff; color: #00ffff; text-align: center; } QProgressBar::chunk { background-color: #00ffff; }")
+        layout.addWidget(self.progress)
+
+        self.setLayout(layout)
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_progress)
+        self.val = 0
+        self.timer.start(30)
+
+    def update_progress(self):
+        self.val += 2
+        self.progress.setValue(self.val)
+        if self.val >= 100:
+            self.timer.stop()
+            self.label.setText("IDENTITY VERIFIED: WELCOME MR. STARK")
+            QTimer.singleShot(1000, self.finish)
+
+    def finish(self):
+        self.close()
+        self.callback()
+
 class JarvisHUD(QWidget):
     def __init__(self):
         super().__init__()
+        self.is_authenticated = False
         self.initUI()
+        self.hide() # Hide until splash finishes
 
     def initUI(self):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Tool)
