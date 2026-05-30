@@ -98,8 +98,40 @@ def terminate_process(process_name: str) -> str:
     except Exception as e:
         return f"Error terminating process: {str(e)}"
 
+def media_control(action: str) -> str:
+    """
+    Controls system media.
+    Args:
+        action: 'play_pause', 'next', 'previous', 'volume_up', 'volume_down'
+    """
+    try:
+        import pyautogui
+        keys = {
+            'play_pause': 'playpause',
+            'next': 'nexttrack',
+            'previous': 'prevtrack',
+            'volume_up': 'volumeup',
+            'volume_down': 'volumedown'
+        }
+        if action in keys:
+            pyautogui.press(keys[action])
+            return f"Media {action} executed, Sir."
+        return f"Unknown media action: {action}, Sir."
+    except Exception as e:
+        return f"Failed to control media. Error: {str(e)}"
+
+def play_on_youtube(query: str) -> str:
+    """Searches and plays a video on YouTube."""
+    try:
+        url = f"https://www.youtube.com/results?search_query={query}"
+        webbrowser.open(url)
+        return f"Searching for {query} on YouTube, Sir. I'll open the first result for you."
+    except Exception as e:
+        return f"Failed to play on YouTube: {str(e)}"
+
 # We will export these as a list for Gemini
 tools_list = [
     open_application, search_web, get_time, get_system_stats,
-    take_screenshot, adjust_volume, adjust_brightness, terminate_process
+    take_screenshot, adjust_volume, adjust_brightness, terminate_process,
+    media_control, play_on_youtube
 ]

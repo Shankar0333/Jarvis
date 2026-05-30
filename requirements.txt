@@ -13,9 +13,9 @@ pandas
 python-pptx
 openpyxl
 psutil
-pyttsx3
 beautifulsoup4
+yfinance
+lxml
 pycaw
-comtypes
 screen-brightness-control
-beautifulsoup4
+comtypes

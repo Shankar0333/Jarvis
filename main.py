@@ -45,13 +45,14 @@ class JarvisApp:
                 reminders = memory_manager.get_reminders()
                 if "no pending reminders" not in reminders.lower():
                     self.hud.add_log("PROACTIVE ALERT: Reminder due.")
-                    # In a real app, check specific time. For now, just log.
+                    # We could play a chime here if we had a sound file
                 last_remind_check = now
 
-            # Monitor battery/CPU
+            # Monitor CPU
             import psutil
-            if psutil.cpu_percent() > 90:
-                 self.hud.add_log("WARNING: CPU load critical.")
+            cpu_usage = psutil.cpu_percent()
+            if cpu_usage > 90:
+                 self.hud.add_log(f"WARNING: CPU load critical ({cpu_usage}%).")
 
             time.sleep(10)
 

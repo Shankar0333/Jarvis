@@ -75,6 +75,34 @@ class BiometricSplash(QWidget):
         self.close()
         self.callback()
 
+class TargetingReticle(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedSize(200, 200)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update)
+        self.timer.start(50)
+        self.pulse = 0
+        self.active = False
+
+    def paintEvent(self, event):
+        if not self.active: return
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        self.pulse = (self.pulse + 5) % 100
+        opacity = 255 - (self.pulse * 2)
+
+        painter.setPen(QPen(QColor(255, 0, 0, opacity), 2))
+        # Crosshairs
+        painter.drawLine(100, 0, 100, 200)
+        painter.drawLine(0, 100, 200, 100)
+        # Corners
+        painter.drawPolyline([QPoint(10, 30), QPoint(10, 10), QPoint(30, 10)])
+        painter.drawPolyline([QPoint(170, 10), QPoint(190, 10), QPoint(190, 30)])
+        painter.drawPolyline([QPoint(10, 170), QPoint(10, 190), QPoint(30, 190)])
+        painter.drawPolyline([QPoint(170, 190), QPoint(190, 190), QPoint(190, 170)])
+
 class JarvisHUD(QWidget):
     def __init__(self):
         super().__init__()
@@ -101,6 +129,10 @@ class JarvisHUD(QWidget):
         status_vbox.addWidget(self.status_label)
 
         header_layout.addLayout(status_vbox)
+
+        self.reticle = TargetingReticle(self)
+        header_layout.addWidget(self.reticle)
+
         main_layout.addLayout(header_layout)
 
         # System Stats
@@ -143,6 +175,10 @@ class JarvisHUD(QWidget):
 
     def update_status(self, text):
         self.status_label.setText(text.upper())
+        if "THINKING" in text.upper():
+            self.reticle.active = True
+        else:
+            self.reticle.active = False
 
     def update_output(self, text):
         self.output_label.setText(text)
