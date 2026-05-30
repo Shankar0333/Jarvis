@@ -13,13 +13,20 @@ def open_application(app_name: str) -> str:
         app_name: The name or path of the application to open.
     """
     try:
-        # Use shlex to safely split command if it contains arguments
-        # But for simple app names, we just pass as a list to avoid shell=True
-        args = shlex.split(app_name)
-        subprocess.Popen(args)
+        if os.name == 'nt':
+            # On Windows, os.startfile is more robust for opening apps by name
+            os.startfile(app_name)
+        else:
+            args = shlex.split(app_name)
+            subprocess.Popen(args)
         return f"Opening {app_name}, Sir."
     except Exception as e:
-        return f"I couldn't open {app_name}. Error: {str(e)}"
+        # Fallback to subprocess if startfile fails
+        try:
+            subprocess.Popen(shlex.split(app_name))
+            return f"Opening {app_name}, Sir."
+        except:
+            return f"I couldn't open {app_name}. Error: {str(e)}"
 
 def search_web(query: str) -> str:
     """

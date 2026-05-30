@@ -8,4 +8,9 @@ python-dotenv
 pyaudio
 opencv-python
 requests
+PyPDF2
+pandas
+python-pptx
+openpyxl
 psutil
+pyttsx3

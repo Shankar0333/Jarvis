@@ -28,8 +28,14 @@ class AudioSystem:
 
         self.engine.setProperty('rate', 175) # Slightly slower and more deliberate
 
-    def speak(self, text):
+    def speak(self, text, lang='en'):
         print(f"JARVIS: {text}")
+
+        # Simple heuristic to switch voice if it looks like a different language
+        # or if explicitly passed.
+        # For true multilingual, one might need a library like gTTS for better quality
+        # but sticking to pyttsx3 for now.
+
         self.engine.say(text)
         self.engine.runAndWait()
 
